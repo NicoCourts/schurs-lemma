@@ -1,18 +1,18 @@
-import group_theory.submonoid
 import algebra.module
 
-universe u
-variables {G : Type u} [group G] {𝕜 : Type u} [field 𝕜] {M : Type u} [add_comm_group M] [module 𝕜 M]
+class rep (G : Type*) [group G] (𝕜 : Type*) [field 𝕜]
+(V : Type*) [add_comm_group V] [has_scalar G V] [vector_space 𝕜 V] :=
+(id : ∀ m : V, (1 : G) • m = m)
+(action : ∀ g h : G, ∀ m : V, g • (h • m) = (g * h) • m)
+(distrib : ∀ g : G, ∀ m n : V, g • (m + n) = g • m + g • n)
+(scalar : ∀ k : 𝕜, ∀ v : V, ∀ g : G,  g • (k • v) = k • (g • v))
 
--- From https://github.com/fpvandoorn/group-representations/blob/master/src/group_theory/representation/basic.lean
-class G_module (G : Type*) [group G] (M : Type*) [add_comm_group M]
-  extends has_scalar G M :=
-(id : ∀ m : M, (1 : G) • m = m)
-(mul : ∀ g h : G, ∀ m : M, g • (h • m) = (g * h) • m)
-(linear : ∀ g : G, ∀ m n : M, g • (m + n) = g • m + g • n)
+class subrep (G : Type*) [group G]
+(𝕜 : Type*) [field 𝕜]
+(V : Type*) [add_comm_group V] [has_scalar G V] [module 𝕜 V] [rep G 𝕜 V] extends submodule 𝕜 V :=
+(stable : ∀ g : G, ∀ v : carrier, g • ↑v ∈ carrier)
 
--- A vector space and G-module whose action is 𝕜-linear
-class representation (G:Type*) [group G] (M : Type*) [add_comm_group M] [module 𝕜 M] extends G_module G M :=
-(ex : ∀ k : 𝕜, ∀ m : M, ∀ g : G,  g • (k • m) = k • (g • m))
-
-#check representation G M
+definition irreducible (G : Type*) [group G]
+(𝕜 : Type*) [field 𝕜]
+(V : Type*) [add_comm_group V] [has_scalar G V] [module 𝕜 V] [rep G 𝕜 V] :=
+(∀ W : subrep G 𝕜 V, /-W = 0 or W = V (but I don't know how to write this)-/)
