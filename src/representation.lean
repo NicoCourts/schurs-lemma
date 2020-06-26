@@ -48,7 +48,8 @@ end
 instance : has_top (subrep G 𝕜 V) :=
 begin
     use ⊤,
-    sorry
+    intros g v,
+    exact dec_trivial,
 end
 
 definition irreducible (G : Type*) [group G]
