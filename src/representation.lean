@@ -1,5 +1,6 @@
 import algebra.module
 import linear_algebra.basic
+import tactic
 
 class rep (G : Type*) [group G] (𝕜 : Type*) [field 𝕜]
 (V : Type*) [add_comm_group V] [has_scalar G V] [vector_space 𝕜 V] :=
@@ -13,14 +14,29 @@ variables (G : Type*) [group G] (𝕜 : Type*) [field 𝕜] (V : Type*) [add_com
 class subrep extends submodule 𝕜 V :=
 (stable : ∀ g : G, ∀ v : carrier, g • ↑v ∈ carrier)
 
+lemma act_zero (G : Type*) [group G]
+(𝕜 : Type*) [field 𝕜]
+(V : Type*) [add_comm_group V] [has_scalar G V] [module 𝕜 V] [h : rep G 𝕜 V] :
+∀ g : G, g • (0 : V) = 0 :=
+begin
+    intro g,
+    have hyp := h.distrib,
+    specialize hyp g (0 : V) (0 : V),
+    rw add_zero at hyp,
+    by {exact add_left_eq_self.mp (congr_arg (has_add.add (g • 0)) (congr_arg (has_add.add (g • 0)) (eq.symm hyp)))},
+end
+
 lemma lem1 (G : Type*) [group G]
 (𝕜 : Type*) [field 𝕜]
 (V : Type*) [add_comm_group V] [has_scalar G V] [module 𝕜 V] [rep G 𝕜 V] :
-∀ (g : G), ∀ (v : ((⊥ : submodule 𝕜 V).carrier)), g • ↑v ∈ (⊥ : submodule 𝕜 V).carrier :=
+∀ g : G, ∀ (v : (⊥ : submodule 𝕜 V)), g • ↑v ∈ (⊥ : submodule 𝕜 V) :=
 begin
-    intros g h,
-    --rw submodule.mem_bot,
-    sorry
+    intros g v,
+    rw submodule.mem_bot,
+    have h := submodule.coe_mem v,
+    rw submodule.mem_bot at h,
+    rw h,
+    exact act_zero G 𝕜 V g,
 end
 
 instance : has_bot (subrep G 𝕜 V) :=
