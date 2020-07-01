@@ -58,9 +58,14 @@ class hom :=
 (equiv : ∀ g : G, ∀ v : V, to_fun (g • v) = g • to_fun v)
 (scalar : ∀ k : 𝕜, ∀ v : V, to_fun (k • v) = k • to_fun v)
 
-variables (phi : hom G 𝕜 V W)
+instance : has_coe_to_fun (hom G 𝕜 V W) := ⟨_, λ m, m.to_fun⟩
 
---having trouble with this
+--basic version of schur's lemma
+--todo: maybe make separate definitions for isomorphism and for the zero map
+--todo: prove this theorem (it might require classical logic?)
 
-theorem schur (irred_V : irreducible G 𝕜 V) (irred_W : irreducible G 𝕜 W) :
-∃ k : 𝕜, ∀ v : V, phi.to_fun (k • v) = k • (phi.to_fun v) :=
+theorem irred_thm (irred_V : irreducible G 𝕜 V) (irred_W : irreducible G 𝕜 W) (φ : hom G 𝕜 V W) :
+(∀ v, φ v = 0) ∨ ((∀ w, ∃ v, φ v = w) ∧ (∀ v, φ v = 0 → v = 0)) :=
+begin
+    sorry
+end
