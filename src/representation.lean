@@ -6,27 +6,27 @@ variables (G : Type*) [group G] (𝕜 : Type*) [field 𝕜]
 variables (V : Type*) [add_comm_group V] [has_scalar G V] [vector_space 𝕜 V]
 variables (W : Type*) [add_comm_group W] [has_scalar G W] [vector_space 𝕜 W]
 
-class rep :=
+class act_monoid :=
 (id : ∀ m : V, (1 : G) • m = m)
 (action : ∀ g h : G, ∀ m : V, g • (h • m) = (g * h) • m)
 (distrib : ∀ g : G, ∀ m n : V, g • (m + n) = g • m + g • n)
-(scalar : ∀ k : 𝕜, ∀ v : V, ∀ g : G,  g • (k • v) = k • (g • v))
+
+lemma act_zero [act_monoid G V] :
+∀ g : G, g • (0 : V) = 0 :=
+begin
+    intro g,
+    have h := (act_monoid.distrib) g (0 : V) (0 : V),
+    rw add_zero at h,
+    exact add_left_eq_self.1 (eq.symm h),
+end
+
+class rep extends act_monoid G V :=
+(linear : ∀ k : 𝕜, ∀ v : V, ∀ g : G,  g • (k • v) = k • (g • v))
 
 variables [rep G 𝕜 V] [rep G 𝕜 W]
 
 class subrep extends submodule 𝕜 V :=
 (stable : ∀ g : G, ∀ v : carrier, g • ↑v ∈ carrier)
-
---weird thing: I specifically have to tell this lemma that [rep G 𝕜 V], even though it's already in variables
-lemma act_zero [h : rep G 𝕜 V] :
-∀ g : G, g • (0 : V) = 0 :=
-begin
-    intro g,
-    have h := h.distrib,
-    specialize h g (0 : V) (0 : V),
-    rw add_zero at h,
-    exact add_left_eq_self.1 (eq.symm h),
-end
 
 lemma bot_closed :
 ∀ g : G, ∀ (v : (⊥ : submodule 𝕜 V)), g • ↑v ∈ (⊥ : submodule 𝕜 V) :=
@@ -34,7 +34,7 @@ begin
     intros g v,
     rw submodule.mem_bot,
     rw (submodule.mem_bot 𝕜).1 (submodule.coe_mem v),
-    exact act_zero G 𝕜 V g,
+    exact act_zero G V g,
 end
 
 lemma top_closed :
