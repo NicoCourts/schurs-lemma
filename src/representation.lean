@@ -6,21 +6,21 @@ variables (G : Type*) [group G] (𝕜 : Type*) [field 𝕜]
 variables (V : Type*) [add_comm_group V] [has_scalar G V] [vector_space 𝕜 V]
 variables (W : Type*) [add_comm_group W] [has_scalar G W] [vector_space 𝕜 W]
 
-class act_monoid :=
+class group_module :=
 (id : ∀ m : V, (1 : G) • m = m)
 (action : ∀ g h : G, ∀ m : V, g • (h • m) = (g * h) • m)
 (distrib : ∀ g : G, ∀ m n : V, g • (m + n) = g • m + g • n)
 
-lemma act_zero [act_monoid G V] :
+lemma act_zero [group_module G V] :
 ∀ g : G, g • (0 : V) = 0 :=
 begin
     intro g,
-    have h := (act_monoid.distrib) g (0 : V) (0 : V),
+    have h := (group_module.distrib) g (0 : V) (0 : V),
     rw add_zero at h,
     exact add_left_eq_self.1 (eq.symm h),
 end
 
-class rep extends act_monoid G V :=
+class rep extends group_module G V :=
 (linear : ∀ k : 𝕜, ∀ v : V, ∀ g : G,  g • (k • v) = k • (g • v))
 
 variables [rep G 𝕜 V] [rep G 𝕜 W]
