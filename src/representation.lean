@@ -7,7 +7,7 @@ variables (V : Type*) [add_comm_group V] [has_scalar G V] [vector_space 𝕜 V]
 variables (W : Type*) [add_comm_group W] [has_scalar G W] [vector_space 𝕜 W]
 
 class group_module :=
-(id : ∀ m : V, (1 : G) • m = m)
+(id : ∀ v : V, (1 : G) • v = v)
 (action : ∀ g h : G, ∀ m : V, g • (h • m) = (g * h) • m)
 (distrib : ∀ g : G, ∀ m n : V, g • (m + n) = g • m + g • n)
 
@@ -25,8 +25,53 @@ class rep extends group_module G V :=
 
 variables [rep G 𝕜 V] [rep G 𝕜 W]
 
-class subrep extends submodule 𝕜 V :=
+structure subrep extends submodule 𝕜 V :=
 (stable : ∀ g : G, ∀ v : carrier, g • ↑v ∈ carrier)
+
+variables (V' : subrep G 𝕜 V) (W' : subrep G 𝕜 W)
+
+instance : has_coe_t (subrep G 𝕜 V) (set V) := ⟨λ V', V'.carrier⟩
+instance : has_mem V (subrep G 𝕜 V) := ⟨λ v V', v ∈ (V' : set V)⟩
+instance : has_coe_to_sort (subrep G 𝕜 V) := ⟨_, λ V', {v : V // v ∈ V'}⟩
+
+instance subrep.is_add_comm_group
+[h : add_comm_group (V'.to_submodule)] : add_comm_group V' := {.. h}
+
+instance subrep.is_has_scalar : has_scalar G V' :=
+{smul := λ g, λ ⟨v,h⟩, ⟨g • v, V'.stable g ⟨v,h⟩⟩}
+
+instance subrep.is_group_module : group_module G V' :=
+{id := (begin
+intro v,
+cases v,
+change (⟨(1 : G) • _, _⟩ : V') = (⟨v_val, _⟩ : V'),
+rw subtype.mk_eq_mk,
+rw group_module.id,
+end), action := (begin
+intros g h v,
+cases v,
+change (⟨g • h • _, _⟩ : V') = (⟨(g * h) • _, _⟩ : V'),
+rw subtype.mk_eq_mk,
+rw group_module.action,
+end), distrib := (begin
+intros g v w,
+cases v,
+cases w,
+change (⟨g • (_ + _), _⟩ : V') = (⟨g • _ + g • _, _⟩ : V'),
+rw subtype.mk_eq_mk,
+rw group_module.distrib,
+end)}
+
+instance subrep.is_vector_space
+[h : vector_space 𝕜 (V'.to_submodule)] : vector_space 𝕜 V' := {.. h}
+
+instance subrep.is_rep : rep G 𝕜 V' := {linear := (begin
+intros k v g,
+cases v,
+change (⟨g • k • _, _⟩ : V') = (⟨k • g • _, _⟩ : V'),
+rw subtype.mk_eq_mk,
+rw rep.linear,
+end)}
 
 lemma bot_closed :
 ∀ g : G, ∀ (v : (⊥ : submodule 𝕜 V)), g • ↑v ∈ (⊥ : submodule 𝕜 V) :=
@@ -49,7 +94,7 @@ instance : has_bot (subrep G 𝕜 V) := ⟨⟨⊥,bot_closed G 𝕜 V⟩⟩
 instance : has_top (subrep G 𝕜 V) := ⟨⟨⊤,top_closed G 𝕜 V⟩⟩
 
 definition irreducible : Prop :=
-(∀ V₀ : subrep G 𝕜 V, (V₀ = ⊥) ∨ (V₀ = ⊤))
+(∀ V' : subrep G 𝕜 V, (V' = ⊥) ∨ (V' = ⊤))
 
 --here's an attempt at defining a hom
 
