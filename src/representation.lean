@@ -1,5 +1,4 @@
 import algebra.module
-import ring_theory.algebra
 import linear_algebra.basic
 import tactic
 
@@ -42,49 +41,45 @@ instance subrep.is_has_scalar : has_scalar G V' :=
 {smul := λ g, λ ⟨v,h⟩, ⟨g • v, V'.stable g ⟨v,h⟩⟩}
 
 instance subrep.is_group_module : group_module G V' := {
-    id := (
-        begin
-            intro v,
-            cases v,
-            change (⟨(1 : G) • _, _⟩ : V') = (⟨v_val, _⟩ : V'),
-            rw subtype.mk_eq_mk,
-            rw group_module.id,
-        end
-    ),
-    action := (
-        begin
-            intros g h v,
-            cases v,
-            change (⟨g • h • _, _⟩ : V') = (⟨(g * h) • _, _⟩ : V'),
-            rw subtype.mk_eq_mk,
-            rw group_module.action,
-        end
-    ),
-    distrib := (
-        begin
-            intros g v w,
-            cases v,
-            cases w,
-            change (⟨g • (_ + _), _⟩ : V') = (⟨g • _ + g • _, _⟩ : V'),
-            rw subtype.mk_eq_mk,
-            rw group_module.distrib,
-        end
-    )
+    id :=
+    begin
+        intro v,
+        cases v,
+        change (⟨(1 : G) • _, _⟩ : V') = (⟨v_val, _⟩ : V'),
+        rw subtype.mk_eq_mk,
+        rw group_module.id,
+    end,
+    action :=
+    begin
+        intros g h v,
+        cases v,
+        change (⟨g • h • _, _⟩ : V') = (⟨(g * h) • _, _⟩ : V'),
+        rw subtype.mk_eq_mk,
+        rw group_module.action,
+    end,
+    distrib :=
+    begin
+        intros g v w,
+        cases v,
+        cases w,
+        change (⟨g • (_ + _), _⟩ : V') = (⟨g • _ + g • _, _⟩ : V'),
+        rw subtype.mk_eq_mk,
+        rw group_module.distrib,
+    end
 }
 
 instance subrep.is_vector_space
 [h : vector_space 𝕜 (V'.to_submodule)] : vector_space 𝕜 V' := {.. h}
 
 instance subrep.is_rep : rep G 𝕜 V' := {
-    linear := (
-        begin
-            intros k v g,
-            cases v,
-            change (⟨g • k • _, _⟩ : V') = (⟨k • g • _, _⟩ : V'),
-            rw subtype.mk_eq_mk,
-            rw rep.linear,
-        end
-    )
+    linear :=
+    begin
+        intros k v g,
+        cases v,
+        change (⟨g • k • _, _⟩ : V') = (⟨k • g • _, _⟩ : V'),
+        rw subtype.mk_eq_mk,
+        rw rep.linear,
+    end
 }
 
 lemma bot_closed :
