@@ -1,4 +1,5 @@
 import algebra.module
+import ring_theory.algebra
 import linear_algebra.basic
 import tactic
 
@@ -40,38 +41,51 @@ instance subrep.is_add_comm_group
 instance subrep.is_has_scalar : has_scalar G V' :=
 {smul := λ g, λ ⟨v,h⟩, ⟨g • v, V'.stable g ⟨v,h⟩⟩}
 
-instance subrep.is_group_module : group_module G V' :=
-{id := (begin
-intro v,
-cases v,
-change (⟨(1 : G) • _, _⟩ : V') = (⟨v_val, _⟩ : V'),
-rw subtype.mk_eq_mk,
-rw group_module.id,
-end), action := (begin
-intros g h v,
-cases v,
-change (⟨g • h • _, _⟩ : V') = (⟨(g * h) • _, _⟩ : V'),
-rw subtype.mk_eq_mk,
-rw group_module.action,
-end), distrib := (begin
-intros g v w,
-cases v,
-cases w,
-change (⟨g • (_ + _), _⟩ : V') = (⟨g • _ + g • _, _⟩ : V'),
-rw subtype.mk_eq_mk,
-rw group_module.distrib,
-end)}
+instance subrep.is_group_module : group_module G V' := {
+    id := (
+        begin
+            intro v,
+            cases v,
+            change (⟨(1 : G) • _, _⟩ : V') = (⟨v_val, _⟩ : V'),
+            rw subtype.mk_eq_mk,
+            rw group_module.id,
+        end
+    ),
+    action := (
+        begin
+            intros g h v,
+            cases v,
+            change (⟨g • h • _, _⟩ : V') = (⟨(g * h) • _, _⟩ : V'),
+            rw subtype.mk_eq_mk,
+            rw group_module.action,
+        end
+    ),
+    distrib := (
+        begin
+            intros g v w,
+            cases v,
+            cases w,
+            change (⟨g • (_ + _), _⟩ : V') = (⟨g • _ + g • _, _⟩ : V'),
+            rw subtype.mk_eq_mk,
+            rw group_module.distrib,
+        end
+    )
+}
 
 instance subrep.is_vector_space
 [h : vector_space 𝕜 (V'.to_submodule)] : vector_space 𝕜 V' := {.. h}
 
-instance subrep.is_rep : rep G 𝕜 V' := {linear := (begin
-intros k v g,
-cases v,
-change (⟨g • k • _, _⟩ : V') = (⟨k • g • _, _⟩ : V'),
-rw subtype.mk_eq_mk,
-rw rep.linear,
-end)}
+instance subrep.is_rep : rep G 𝕜 V' := {
+    linear := (
+        begin
+            intros k v g,
+            cases v,
+            change (⟨g • k • _, _⟩ : V') = (⟨k • g • _, _⟩ : V'),
+            rw subtype.mk_eq_mk,
+            rw rep.linear,
+        end
+    )
+}
 
 lemma bot_closed :
 ∀ g : G, ∀ (v : (⊥ : submodule 𝕜 V)), g • ↑v ∈ (⊥ : submodule 𝕜 V) :=
@@ -95,22 +109,3 @@ instance : has_top (subrep G 𝕜 V) := ⟨⟨⊤,top_closed G 𝕜 V⟩⟩
 
 definition irreducible : Prop :=
 (∀ V' : subrep G 𝕜 V, (V' = ⊥) ∨ (V' = ⊤))
-
---here's an attempt at defining a hom
-
-class hom :=
-(to_fun : V → W)
-(equiv : ∀ g : G, ∀ v : V, to_fun (g • v) = g • to_fun v)
-(scalar : ∀ k : 𝕜, ∀ v : V, to_fun (k • v) = k • to_fun v)
-
-instance : has_coe_to_fun (hom G 𝕜 V W) := ⟨_, λ m, m.to_fun⟩
-
---basic version of schur's lemma
---todo: maybe make separate definitions for isomorphism and for the zero map
---todo: prove this theorem (it might require classical logic?)
-
-theorem irred_thm (irred_V : irreducible G 𝕜 V) (irred_W : irreducible G 𝕜 W) (φ : hom G 𝕜 V W) :
-(∀ v, φ v = 0) ∨ ((∀ w, ∃ v, φ v = w) ∧ (∀ v, φ v = 0 → v = 0)) :=
-begin
-    sorry
-end
