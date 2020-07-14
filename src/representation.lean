@@ -17,7 +17,17 @@ begin
     intro g,
     have h := (group_module.distrib) g (0 : V) (0 : V),
     rw add_zero at h,
-    exact add_left_eq_self.1 (eq.symm h),
+    rw add_left_eq_self.1 h.symm,
+end
+
+lemma act_neg [group_module G V] :
+∀ g : G, ∀ v : V, g • -v = -(g • v) :=
+begin
+    intros g v,
+    have h := (group_module.distrib) g v (-v),
+    rw add_right_neg at h,
+    rw act_zero at h,
+    rw neg_eq_of_add_eq_zero h.symm,
 end
 
 class rep extends group_module G V :=
