@@ -8,8 +8,6 @@ variables (W : Type*) [add_comm_group W] [has_scalar G W] [vector_space 𝕜 W]
 
 variables [rep G 𝕜 V] [rep G 𝕜 W]
 
-variables (V' : subrep G 𝕜 V) (W' : subrep G 𝕜 W)
-
 structure hom :=
 (to_fun : V → W)
 (equiv : ∀ g : G, ∀ v : V, to_fun (g • v) = g • to_fun v)
@@ -344,13 +342,3 @@ instance : algebra 𝕜 (hom G 𝕜 V V) := {
         refl,
     end
 }
-
---basic version of schur's lemma
---todo: maybe make separate definitions for isomorphism and for the zero map
---todo: prove this theorem (it might require classical logic?)
-
-theorem irred_thm (irred_V : irreducible G 𝕜 V) (irred_W : irreducible G 𝕜 W) (φ : hom G 𝕜 V W) :
-(φ = 0) ∨ ((∀ w, ∃ v, φ v = w) ∧ (∀ v, φ v = 0 → v = 0)) :=
-begin
-    sorry
-end
