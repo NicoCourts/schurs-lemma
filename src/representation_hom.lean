@@ -10,20 +10,25 @@ variables [rep G 𝕜 V] [rep G 𝕜 W]
 
 structure hom :=
 (to_fun : V → W)
-(equiv : ∀ g : G, ∀ v : V, to_fun (g • v) = g • to_fun v)
-(scalar : ∀ k : 𝕜, ∀ v : V, to_fun (k • v) = k • to_fun v)
-(additive : ∀ v w : V, to_fun (v + w) = to_fun v + to_fun w)
+(equivariant' : ∀ g : G, ∀ v : V, to_fun (g • v) = g • to_fun v)
+(scalar' : ∀ k : 𝕜, ∀ v : V, to_fun (k • v) = k • to_fun v)
+(add' : ∀ v w : V, to_fun (v + w) = to_fun v + to_fun w)
 
 instance : has_coe_to_fun (hom G 𝕜 V W) := ⟨_, λ m, m.to_fun⟩
 
-lemma to_fun_eq_coe (φ : hom G 𝕜 V W) : φ.to_fun = φ := rfl
+@[simp] lemma to_fun_eq_coe (φ : hom G 𝕜 V W) : φ.to_fun = φ := rfl
+
+lemma equivariant (φ : hom G 𝕜 V W) (g : G) (v : V) : φ (g • v) = g • φ v := φ.equivariant' g v
+
+lemma scalar (φ : hom G 𝕜 V W) (k : 𝕜) (v : V) : φ (k • v) = k • φ v := φ.scalar' k v
+
+lemma add (φ : hom G 𝕜 V W) (v w : V) : φ (v + w) = φ v + φ w := φ.add' v w
 
 lemma hom_zero (φ : hom G 𝕜 V W) : φ 0 = 0 :=
 begin
-    have h := hom.additive φ 0 0,
+    have h := add G 𝕜 V W φ 0 0,
     rw add_zero at h,
-    rw ←to_fun_eq_coe,
-    rw add_left_eq_self.1 h.symm,
+    exact add_left_eq_self.1 h.symm,
 end
 
 @[ext] theorem ext (φ ψ : hom G 𝕜 V W) (h : ∀ v, φ v = ψ v) : φ = ψ :=
@@ -37,25 +42,19 @@ instance : add_comm_group (hom G 𝕜 V W) := {
     begin
         intros g v,
         rw group_module.distrib,
-        rw ←to_fun_eq_coe,
-        rw hom.equiv,
-        rw ←to_fun_eq_coe,
-        rw hom.equiv,
+        rw equivariant,
+        rw equivariant,
     end,
     begin
         intros k v,
         rw smul_add,
-        rw ←to_fun_eq_coe,
-        rw hom.scalar,
-        rw ←to_fun_eq_coe,
-        rw hom.scalar,
+        rw scalar,
+        rw scalar,
     end,
     begin
         intros v w,
-        rw ←to_fun_eq_coe,
-        rw ←to_fun_eq_coe,
-        rw hom.additive,
-        rw hom.additive,
+        rw add,
+        rw add,
         abel,
     end⟩,
     add_assoc :=
@@ -98,20 +97,17 @@ instance : add_comm_group (hom G 𝕜 V W) := {
     neg := λ φ, ⟨λ v, - φ v,
     begin
         intros g v,
-        rw ←to_fun_eq_coe,
-        rw hom.equiv,
+        rw equivariant,
         rw act_neg,
     end,
     begin
         intros k v,
-        rw ←to_fun_eq_coe,
-        rw hom.scalar,
+        rw scalar,
         rw smul_neg,
     end,
     begin
         intros v w,
-        rw ←to_fun_eq_coe,
-        rw hom.additive,
+        rw add,
         rw neg_add,
     end⟩,
     add_left_neg :=
@@ -136,20 +132,17 @@ instance : module 𝕜 (hom G 𝕜 V W) := {
     smul := λ k, λ φ, ⟨λ v, k • φ v,
     begin
         intros g v,
-        rw ←to_fun_eq_coe,
-        rw hom.equiv,
+        rw equivariant,
         rw rep.linear,
     end,
     begin
         intros k v,
-        rw ←to_fun_eq_coe,
-        rw hom.scalar,
+        rw scalar,
         rw smul_comm,
     end,
     begin
         intros v w,
-        rw ←to_fun_eq_coe,
-        rw hom.additive,
+        rw add,
         rw smul_add,
     end⟩,
     one_smul :=
@@ -212,24 +205,18 @@ instance : semiring (hom G 𝕜 V V) := {
     mul := λ φ ψ, ⟨λ v, φ (ψ v),
     begin
         intros g v,
-        rw ←to_fun_eq_coe,
-        rw ←to_fun_eq_coe,
-        rw hom.equiv,
-        rw hom.equiv,
+        rw equivariant,
+        rw equivariant,
     end,
     begin
         intros k v,
-        rw ←to_fun_eq_coe,
-        rw ←to_fun_eq_coe,
-        rw hom.scalar,
-        rw hom.scalar,
+        rw scalar,
+        rw scalar,
     end,
     begin
         intros v w,
-        rw ←to_fun_eq_coe,
-        rw ←to_fun_eq_coe,
-        rw hom.additive,
-        rw hom.additive,
+        rw add,
+        rw add,
     end⟩,
     mul_assoc :=
     begin
@@ -271,8 +258,7 @@ instance : semiring (hom G 𝕜 V V) := {
         rw ext_iff,
         intro v,
         change φ (ψ v + χ v) = φ (ψ v) + φ (χ v),
-        rw ←to_fun_eq_coe,
-        rw hom.additive,
+        rw add,
     end,
     right_distrib :=
     begin
@@ -331,8 +317,7 @@ instance : algebra 𝕜 (hom G 𝕜 V V) := {
         rw ext_iff,
         intro v,
         change k • φ v = φ (k • v),
-        rw ←to_fun_eq_coe,
-        rw hom.scalar,
+        rw scalar,
     end,
     smul_def' :=
     begin
