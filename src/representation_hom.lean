@@ -31,11 +31,11 @@ begin
     exact add_left_eq_self.1 h.symm,
 end
 
-@[ext] theorem ext (φ ψ : hom G 𝕜 V W) (h : ∀ v, φ v = ψ v) : φ = ψ :=
+@[ext] theorem fun_ext (φ ψ : hom G 𝕜 V W) (h : ∀ v, φ v = ψ v) : φ = ψ :=
 by cases φ; cases ψ; congr'; exact funext h
 
 theorem ext_iff (φ ψ : hom G 𝕜 V W) : φ = ψ ↔ ∀ v, φ v = ψ v :=
-⟨by { rintro rfl v, refl } , ext G 𝕜 V W φ ψ⟩
+⟨by { rintro rfl v, refl } , fun_ext G 𝕜 V W φ ψ⟩
 
 instance : add_comm_group (hom G 𝕜 V W) := {
     add := λ φ ψ, ⟨λ v, (φ v) + (ψ v),

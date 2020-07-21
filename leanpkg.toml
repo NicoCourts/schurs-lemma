@@ -1,8 +1,8 @@
 [package]
 name = "schurs-lemma"
 version = "0.1"
-lean_version = "leanprover-community/lean:3.16.3"
+lean_version = "leanprover-community/lean:3.17.1"
 path = "src"
 
 [dependencies]
-mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "103743e3d09bdce5a9dc8265f78feaa8551e9348"}
+mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "c47d1d0d942e4668c923e0c737b9cdcaaada23a5"}
